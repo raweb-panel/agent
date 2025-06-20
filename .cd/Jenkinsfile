@@ -60,7 +60,10 @@ pipeline {
     stage('Release to GitHub') {
       steps {
         sh """
-          echo "${GITHUB_TOKEN}" | gh auth login --with-token
+          apk add --no-cache curl
+          curl -fsSL https://github.com/cli/cli/releases/latest/download/gh_$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/;s/armv7l/armv6l/')_alpine.apk -o /tmp/gh.apk
+          apk add --no-cache /tmp/gh.apk
+          export GITHUB_TOKEN='${GITHUB_TOKEN}'
           gh release create ${env.NEXT_TAG} agent.tar.gz \
             --repo raweb-panel/agent \
             --title "${env.NEXT_TAG}" \
