@@ -50,6 +50,7 @@ pipeline {
         sh """
           git config user.name "jenkins"
           git config user.email "cd@julio.al"
+          git remote set-url origin https://${GITHUB_TOKEN}@github.com/raweb-panel/agent.git
           git tag ${env.NEXT_TAG}
           git push origin ${env.NEXT_TAG}
         """
