@@ -46,7 +46,7 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.Handle("/system/user/create", authorization.AuthMiddleware(http.HandlerFunc(user.CreateUserHandler)))
-	mux.Handle("/system/user/delete", authorization.AuthMiddleware(http.HandlerFunc(user.DeleteUserHandler)))
+	// mux.Handle("/system/user/delete", authorization.AuthMiddleware(http.HandlerFunc(user.DeleteUserHandler)))
 	mux.Handle("/app/list_all", authorization.AuthMiddleware(http.HandlerFunc(docker.ListContainersHandler)))
 	mux.Handle("/app/delete", authorization.AuthMiddleware(http.HandlerFunc(docker.DeleteContainerHandler)))
 	log.Printf("Agent running on :%s (project path: %s)\n", cfg.Port, cfg.ProjectPath)

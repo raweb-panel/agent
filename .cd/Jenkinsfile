@@ -1,5 +1,9 @@
 pipeline {
-  agent any
+  agent {
+    dockerContainer {
+      image 'theraw/jenkinsgo:1.23.10'
+    }
+  }
 
   environment {
     GITHUB_TOKEN = credentials('github-token')
@@ -16,7 +20,7 @@ pipeline {
     stage('Bump Version') {
       steps {
         script {
-          // Find latest tag (or default to v1.0.0 if none)
+          // Get latest tag or fallback to v1.0.0
           def latestTag = sh(returnStdout: true, script: """
             git tag --sort=version:refname | tail -n1
           """).trim()
@@ -25,7 +29,7 @@ pipeline {
           }
           echo "Latest tag: ${latestTag}"
 
-          // Increment patch: vA.B.C -> vA.B.(C+1)
+          // Increment patch version
           def parts = latestTag.replaceFirst('^v','').split('\\.')
           def nextTag = "v${parts[0]}.${parts[1]}.${(parts[2].toInteger()+1)}"
           echo "Next tag: ${nextTag}"
@@ -37,13 +41,15 @@ pipeline {
     stage('Build') {
       steps {
         sh 'go build -o agent run.go'
-        sh 'tar -czf agent.tar.gz agent'
+        sh 'tar -czf agent.tar.gz agent config.json'
       }
     }
 
     stage('Tag & Push') {
       steps {
         sh """
+          git config user.name "jenkins"
+          git config user.email "cd@julio.al"
           git tag ${env.NEXT_TAG}
           git push origin ${env.NEXT_TAG}
         """
@@ -53,6 +59,7 @@ pipeline {
     stage('Release to GitHub') {
       steps {
         sh """
+          echo "${GITHUB_TOKEN}" | gh auth login --with-token
           gh release create ${env.NEXT_TAG} agent.tar.gz \
             --repo raweb-panel/agent \
             --title "${env.NEXT_TAG}" \
