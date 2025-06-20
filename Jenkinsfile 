@@ -1,0 +1,64 @@
+pipeline {
+  agent any
+
+  environment {
+    GITHUB_TOKEN = credentials('github-token')
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        checkout scm
+        sh 'git fetch --tags'
+      }
+    }
+
+    stage('Bump Version') {
+      steps {
+        script {
+          // Find latest tag (or default to v1.0.0 if none)
+          def latestTag = sh(returnStdout: true, script: """
+            git tag --sort=version:refname | tail -n1
+          """).trim()
+          if (!latestTag) {
+            latestTag = "v1.0.0"
+          }
+          echo "Latest tag: ${latestTag}"
+
+          // Increment patch: vA.B.C -> vA.B.(C+1)
+          def parts = latestTag.replaceFirst('^v','').split('\\.')
+          def nextTag = "v${parts[0]}.${parts[1]}.${(parts[2].toInteger()+1)}"
+          echo "Next tag: ${nextTag}"
+          env.NEXT_TAG = nextTag
+        }
+      }
+    }
+
+    stage('Build') {
+      steps {
+        sh 'go build -o agent run.go'
+        sh 'tar -czf agent.tar.gz agent'
+      }
+    }
+
+    stage('Tag & Push') {
+      steps {
+        sh """
+          git tag ${env.NEXT_TAG}
+          git push origin ${env.NEXT_TAG}
+        """
+      }
+    }
+
+    stage('Release to GitHub') {
+      steps {
+        sh """
+          gh release create ${env.NEXT_TAG} agent.tar.gz \
+            --repo raweb-panel/agent \
+            --title "${env.NEXT_TAG}" \
+            --notes "Automated release ${env.NEXT_TAG}"
+        """
+      }
+    }
+  }
+}
