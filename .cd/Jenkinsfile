@@ -60,10 +60,9 @@ pipeline {
     stage('Release to GitHub') {
       steps {
         sh """
-          GH_VERSION=2.44.1
-          curl -fsSL https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_amd64.tar.gz -o /tmp/gh.tar.gz
+          curl -fsSL https://github.com/cli/cli/releases/download/v2.74.2/gh_2.74.2_linux_amd64.tar.gz -o /tmp/gh.tar.gz
           tar -xzf /tmp/gh.tar.gz -C /tmp
-          cp /tmp/gh_${GH_VERSION}_linux_amd64/bin/gh /usr/local/bin/
+          cp /tmp/gh_2.74.2_linux_amd64/bin/gh /usr/local/bin/
           export GITHUB_TOKEN="${GITHUB_TOKEN}"
           gh --version
           gh release create ${env.NEXT_TAG} agent.tar.gz \
