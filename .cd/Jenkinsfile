@@ -62,7 +62,7 @@ pipeline {
         sh """
           curl -fsSL https://github.com/cli/cli/releases/download/v2.74.2/gh_2.74.2_linux_amd64.tar.gz -o /tmp/gh.tar.gz
           tar -xzf /tmp/gh.tar.gz -C /tmp
-          cp /tmp/gh_2.74.2_linux_amd64/bin/gh /usr/local/bin/
+          cp /tmp/gh_2.74.2_linux_amd64/bin/gh /usr/local/bin/; chmod +x /usr/local/bin/gh
           export GITHUB_TOKEN="${GITHUB_TOKEN}"
           gh --version
           gh release create ${env.NEXT_TAG} agent.tar.gz \
