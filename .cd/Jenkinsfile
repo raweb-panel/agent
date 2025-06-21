@@ -47,27 +47,26 @@ pipeline {
 
     stage('Tag & Push') {
       steps {
-        sh """
+        sh '''
           git config user.name "jenkins"
           git config user.email "cd@julio.al"
-          git remote set-url origin https://${GITHUB_TOKEN}@github.com/raweb-panel/agent.git
+          git remote set-url origin https://$GITHUB_TOKEN@github.com/raweb-panel/agent.git
           git tag ${env.NEXT_TAG}
           git push origin ${env.NEXT_TAG}
-        """
+        '''
       }
     }
 
     stage('Release to GitHub') {
-      steps {
-        sh """
-          export GITHUB_TOKEN="${GITHUB_TOKEN}"
-          gh --version
-          gh release create ${env.NEXT_TAG} agent.tar.gz \
+    steps {
+        withEnv(["GITHUB_TOKEN=${GITHUB_TOKEN}"]) {
+        sh '''
+            gh release create ${env.NEXT_TAG} agent.tar.gz \
             --repo raweb-panel/agent \
             --title "${env.NEXT_TAG}" \
             --notes "Automated release ${env.NEXT_TAG}"
-        """
-      }
+        '''
+        }
     }
   }
 }
