@@ -2,6 +2,6 @@
 
 Support :
 
-    [x] Linux
+[x] Linux
 
 ![](https://jenkins.julio.al/job/raweb-agent/badge/icon)
