@@ -59,16 +59,13 @@ pipeline {
 
     stage('Release to GitHub') {
       steps {
-        withEnv(["GITHUB_TOKEN=${GITHUB_TOKEN}"]) {
-          sh '''
-            gh release create $NEXT_TAG agent.tar.gz \
-              --repo raweb-panel/agent \
-              --title "$NEXT_TAG" \
-              --notes "Automated release $NEXT_TAG"
-          '''
-        }
+        sh '''
+        gh release create $NEXT_TAG agent.tar.gz \
+            --repo raweb-panel/agent \
+            --title "$NEXT_TAG" \
+            --notes "Automated release $NEXT_TAG"
+        '''
       }
     }
-
   }
 }
