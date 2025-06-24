@@ -12,7 +12,6 @@ func CreateHome(serverName, username string) error {
 	userHome := "/home/" + username
 	domainDir := filepath.Join(userHome, serverName)
 
-	// 1. Create system user if it doesn't exist, with shell disabled
 	if !userExists(username) {
 		cmd := exec.Command("useradd", "-m", "-d", userHome, "-s", "/usr/sbin/nologin", username)
 		if err := cmd.Run(); err != nil {
@@ -20,7 +19,6 @@ func CreateHome(serverName, username string) error {
 		}
 	}
 
-	// 2. Ensure user's home folder exists and set ownership
 	if _, err := os.Stat(userHome); os.IsNotExist(err) {
 		if err := os.MkdirAll(userHome, 0755); err != nil {
 			return errors.New("failed to create home directory: " + userHome)
@@ -28,7 +26,6 @@ func CreateHome(serverName, username string) error {
 	}
 	exec.Command("chown", "-R", username+":"+username, userHome).Run()
 
-	// 3. Create domain folder and subfolders
 	subdirs := []string{"public_html", "logs", "tmp"}
 	if _, err := os.Stat(domainDir); os.IsNotExist(err) {
 		if err := os.MkdirAll(domainDir, 0755); err != nil {
@@ -44,8 +41,6 @@ func CreateHome(serverName, username string) error {
 		}
 	}
 	exec.Command("chown", "-R", username+":"+username, domainDir).Run()
-
-	// 4. Copy default config directory to /home/configs/$username/$serverName/config
 	defaultConfig := "/raweb/web/panel/app/Helpers/defaults/config"
 	targetConfigDir := filepath.Join("/home/configs", username, serverName, "config")
 	if err := os.MkdirAll(targetConfigDir, 0755); err != nil {
