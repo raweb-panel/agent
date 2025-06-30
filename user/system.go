@@ -12,6 +12,7 @@ func CreateHome(serverName, username string) error {
 	userHome := "/home/" + username
 	domainDir := filepath.Join(userHome, serverName)
 
+	// 1. Create user if missing
 	if !userExists(username) {
 		cmd := exec.Command("useradd", "-m", "-d", userHome, "-s", "/usr/sbin/nologin", username)
 		if err := cmd.Run(); err != nil {
@@ -19,6 +20,7 @@ func CreateHome(serverName, username string) error {
 		}
 	}
 
+	// 2. Create home dir if missing
 	if _, err := os.Stat(userHome); os.IsNotExist(err) {
 		if err := os.MkdirAll(userHome, 0755); err != nil {
 			return errors.New("failed to create home directory: " + userHome)
@@ -26,11 +28,15 @@ func CreateHome(serverName, username string) error {
 	}
 	exec.Command("chown", "-R", username+":"+username, userHome).Run()
 
+	// 3. If domain dir exists, return error
+	if _, err := os.Stat(domainDir); err == nil {
+		return errors.New("domain_exists")
+	}
+
+	// 4. Create domain dir and subdirs
 	subdirs := []string{"public_html", "logs", "tmp"}
-	if _, err := os.Stat(domainDir); os.IsNotExist(err) {
-		if err := os.MkdirAll(domainDir, 0755); err != nil {
-			return errors.New("failed to create domain directory: " + domainDir)
-		}
+	if err := os.MkdirAll(domainDir, 0755); err != nil {
+		return errors.New("failed to create domain directory: " + domainDir)
 	}
 	for _, subdir := range subdirs {
 		path := filepath.Join(domainDir, subdir)
@@ -41,6 +47,8 @@ func CreateHome(serverName, username string) error {
 		}
 	}
 	exec.Command("chown", "-R", username+":"+username, domainDir).Run()
+
+	// 5. Copy config
 	defaultConfig := "/raweb/web/panel/app/Helpers/defaults/config"
 	targetConfigDir := filepath.Join("/home/configs", username, serverName, "config")
 	if err := os.MkdirAll(targetConfigDir, 0755); err != nil {

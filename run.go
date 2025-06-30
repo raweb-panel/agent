@@ -52,10 +52,18 @@ func main() {
 	mux.Handle("/container/stop", authorization.AuthMiddleware(http.HandlerFunc(docker.StopContainerHandler)))
 	mux.Handle("/container/start", authorization.AuthMiddleware(http.HandlerFunc(docker.StartContainerHandler)))
 	mux.Handle("/container/kill", authorization.AuthMiddleware(http.HandlerFunc(docker.KillContainerHandler)))
+	mux.Handle("/container/create", authorization.AuthMiddleware(http.HandlerFunc(docker.CreateContainerHandler)))
+	mux.Handle("/container/get_by_id", authorization.AuthMiddleware(http.HandlerFunc(docker.GetContainerByIDHandler)))
+	mux.Handle("/container/get_by_name", authorization.AuthMiddleware(http.HandlerFunc(docker.GetContainerByNameHandler)))
+	mux.Handle("/container/stats_by_name", authorization.AuthMiddleware(http.HandlerFunc(docker.GetContainerStatsByNameHandler)))
 
 	mux.Handle("/network/create", authorization.AuthMiddleware(http.HandlerFunc(docker.CreateNetworkHandler)))
 	mux.Handle("/network/list", authorization.AuthMiddleware(http.HandlerFunc(docker.ListNetworksHandler)))
 	mux.Handle("/network/delete", authorization.AuthMiddleware(http.HandlerFunc(docker.DeleteNetworkHandler)))
+
+	mux.Handle("/image/list", authorization.AuthMiddleware(http.HandlerFunc(docker.ListImagesHandler)))
+	mux.Handle("/image/delete", authorization.AuthMiddleware(http.HandlerFunc(docker.DeleteImageHandler)))
+
 	log.Printf("Agent running on :%s (project path: %s)\n", cfg.Port, cfg.ProjectPath)
 	log.Fatal(http.ListenAndServe(":"+cfg.Port, mux))
 }
