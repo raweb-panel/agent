@@ -8,7 +8,6 @@ Features :
  - Nginx Config handler. (create, edit, delete)
  - Uses docker socket without need of exposing tcp for api usage.
 
-
  --- 
 
  This version of agent, is a free copy, the features are limited without limiting the functionality of app deployments, management, or other core features. 
