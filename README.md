@@ -16,9 +16,9 @@ Features :
 
 ## License
 
-By downloading, installing, or using the software, the Licensee agrees to be bound by the terms of this License. [Custom Deployment License (CDL)](./LICENSE).  
-Free for commercial use on up to 100 nodes and 100 websites per node.
-"Developer Statistics", Must remain enabled for the simply purpose of above numbers tracking.
-Redistribution, resale, or large-scale deployment requires a commercial license.
+- By downloading, installing, or using the software, the Licensee agrees to be bound by the terms of this License. [Custom Deployment License (CDL)](./LICENSE).  
+- Free for commercial use on up to 100 nodes and 100 websites per node.
+- "Developer Statistics", Must remain enabled for the simply purpose of above numbers tracking.
+- Redistribution, resale, or large-scale deployment requires a commercial license.
 
 Contact me@julio.al for enterprise licensing or additional rights/questions.
