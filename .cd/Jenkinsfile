@@ -48,7 +48,7 @@ pipeline {
       }
     }
 
-    stage('Create Multi-OS DEB Packages') {
+    stage('Create Multi-OS Packages') {
       parallel {
         stage('Debian 12 (Bookworm)') {
           steps {
@@ -78,6 +78,20 @@ pipeline {
             }
           }
         }
+        stage('AlmaLinux 9') {
+          steps {
+            script {
+              createRpmPackage('alma9', 'AlmaLinux', '9')
+            }
+          }
+        }
+        stage('AlmaLinux 8') {
+          steps {
+            script {
+              createRpmPackage('alma8', 'AlmaLinux', '8')
+            }
+          }
+        }
       }
     }
 
@@ -101,6 +115,8 @@ pipeline {
             raweb-agent_${VERSION}_debian11_amd64.deb \
             raweb-agent_${VERSION}_ubuntu2404_amd64.deb \
             raweb-agent_${VERSION}_ubuntu2204_amd64.deb \
+            raweb-agent-${VERSION}-1.alma9.x86_64.rpm \
+            raweb-agent-${VERSION}-1.alma8.x86_64.rpm \
             --repo raweb-panel/agent \
             --title "$NEXT_TAG" \
             --notes "Automated release: $NEXT_TAG"
@@ -108,7 +124,7 @@ pipeline {
       }
     }
 
-    stage('Upload DEB Packages to Repository') {
+    stage('Upload Packages to Repository') {
       parallel {
         stage('Upload Debian 12') {
           steps {
@@ -154,6 +170,28 @@ pipeline {
             '''
           }
         }
+        stage('Upload AlmaLinux 9') {
+          steps {
+            sh '''
+            curl -X POST \
+              -H "Authorization: Bearer $GITHUB_TOKEN" \
+              -F "file=@raweb-agent-${VERSION}-1.alma9.x86_64.rpm" \
+              -F "distribution=alma9" \
+              https://repo.julio.al/upload/rpm
+            '''
+          }
+        }
+        stage('Upload AlmaLinux 8') {
+          steps {
+            sh '''
+            curl -X POST \
+              -H "Authorization: Bearer $GITHUB_TOKEN" \
+              -F "file=@raweb-agent-${VERSION}-1.alma8.x86_64.rpm" \
+              -F "distribution=alma8" \
+              https://repo.julio.al/upload/rpm
+            '''
+          }
+        }
       }
     }
   }
@@ -161,11 +199,12 @@ pipeline {
   post {
     always {
       // Clean up
-      sh 'rm -rf deb-package-*'
+      sh 'rm -rf deb-package-* rpm-package-* rpmbuild'
     }
     success {
       echo "Build completed successfully!"
       echo "DEB packages uploaded to https://repo.julio.al/upload/deb"
+      echo "RPM packages uploaded to https://repo.julio.al/upload/rpm"
     }
     failure {
       echo "Build failed!"
@@ -281,5 +320,111 @@ EOF
   # Build the package
   dpkg-deb --build deb-package-${distId}/raweb-agent
   mv deb-package-${distId}/raweb-agent.deb raweb-agent_${VERSION}_${distId}_amd64.deb
+  """
+}
+
+def createRpmPackage(distId, distName, distVersion) {
+  sh """
+  # Install rpm-build tools
+  apt-get update && apt-get install -y rpm
+
+  # Create RPM build directory structure
+  mkdir -p rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+
+  # Create spec file
+  cat > rpmbuild/SPECS/raweb-agent.spec << 'EOF'
+Name:           raweb-agent
+Version:        ${VERSION}
+Release:        1.${distId}
+Summary:        Raweb Panel Agent
+License:        Custom
+URL:            https://github.com/raweb-panel/agent
+BuildArch:      x86_64
+Requires:       systemd
+
+%description
+Agent for Raweb Panel management system
+Built for ${distName} ${distVersion}
+
+%prep
+# No preparation needed
+
+%build
+# No build needed
+
+%install
+mkdir -p %{buildroot}/raweb/apps/agent
+mkdir -p %{buildroot}/etc/systemd/system
+
+# Copy binary and config
+cp %{_sourcedir}/agent %{buildroot}/raweb/apps/agent/
+cp %{_sourcedir}/config.json %{buildroot}/raweb/apps/agent/
+
+# Create systemd service file
+cat > %{buildroot}/etc/systemd/system/raweb-agent.service << 'SERVICE'
+[Unit]
+Description=Raweb Panel Agent
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/raweb/apps/agent
+ExecStart=/raweb/apps/agent/agent --config=/raweb/apps/agent/config.json
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+SERVICE
+
+%files
+/raweb/apps/agent/agent
+/raweb/apps/agent/config.json
+/etc/systemd/system/raweb-agent.service
+
+%post
+systemctl daemon-reload
+systemctl enable raweb-agent.service
+if ! systemctl is-active --quiet raweb-agent.service; then
+    systemctl start raweb-agent.service
+fi
+echo "Raweb Agent installed and started successfully"
+
+%preun
+if systemctl is-active --quiet raweb-agent.service; then
+    systemctl stop raweb-agent.service
+fi
+if systemctl is-enabled --quiet raweb-agent.service; then
+    systemctl disable raweb-agent.service
+fi
+
+%postun
+systemctl daemon-reload
+if [ -d "/raweb/apps/agent" ] && [ -z "\$(ls -A /raweb/apps/agent)" ]; then
+    rmdir /raweb/apps/agent
+fi
+if [ -d "/raweb/apps" ] && [ -z "\$(ls -A /raweb/apps)" ]; then
+    rmdir /raweb/apps
+fi
+echo "Raweb Agent removed successfully"
+
+%changelog
+* \$(date "+%a %b %d %Y") Jenkins <cd@julio.al> - ${VERSION}-1.${distId}
+- Automated build for ${distName} ${distVersion}
+EOF
+
+  # Copy source files
+  cp agent rpmbuild/SOURCES/
+  cp config.json rpmbuild/SOURCES/
+
+  # Build RPM
+  rpmbuild --define "_topdir \$(pwd)/rpmbuild" -ba rpmbuild/SPECS/raweb-agent.spec
+
+  # Move the built RPM to the workspace
+  mv rpmbuild/RPMS/x86_64/raweb-agent-${VERSION}-1.${distId}.x86_64.rpm .
   """
 }
