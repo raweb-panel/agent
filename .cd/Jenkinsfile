@@ -110,13 +110,6 @@ pipeline {
 - Debian 11 (Bullseye)
 - Ubuntu 24.04 (Noble Numbat)
 - Ubuntu 22.04 (Jammy Jellyfish)
-
-## Installation:
-Add repository to your system:
-```bash
-echo \\"deb [trusted=yes] https://repo.julio.al/ DISTRIBUTION main\\" | sudo tee /etc/apt/sources.list.d/raweb.list
-sudo apt update
-sudo apt install raweb-agent
 ```
         '''
       }
