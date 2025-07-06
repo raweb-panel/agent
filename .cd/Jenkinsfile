@@ -325,9 +325,6 @@ EOF
 
 def createRpmPackage(distId, distName, distVersion) {
   sh """
-  # Install rpm-build tools
-  apt-get update && apt-get install -y rpm
-
   # Create RPM build directory structure
   mkdir -p rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
 
