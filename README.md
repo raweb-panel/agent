@@ -22,7 +22,7 @@ sudo apt update; sudo apt install -y raweb-agent
 
 AlmaLinux Based.
 ```bash
-sudo dnf install -y wget ca-certificates gnupg2 sudo
+sudo dnf install -y wget ca-certificates gnupg2
 # For AlmaLinux 9:
 sudo tee /etc/yum.repos.d/raweb.repo << 'EOF'
 [raweb-alma9]
