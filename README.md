@@ -1,11 +1,11 @@
 # raweb panel agent. ![](https://jenkins.julio.al/job/raweb-agent/badge/icon)
 
 Features :
- - Container controller (create, start, stop, kill, info)
- - Container stats (cpu, ram, bandwidth)
- - Images (pull, delete)
- - System user handler. (create, delete)
- - Nginx Config handler. (create, edit, delete)
+ - Container controller (create, start, stop, kill, info).
+ - Container stats (cpu, ram, bandwidth).
+ - Images (pull, delete).
+ - System user handler. (create, delete).
+ - Nginx Config handler. (create, edit, delete).
  - Uses docker socket without need of exposing tcp for api usage.
 
  --- 
