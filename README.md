@@ -1,5 +1,13 @@
 # raweb panel agent. ![](https://jenkins.julio.al/job/raweb-agent/badge/icon)
 
+# Installation 
+
+```
+apt update; apt install -y wget apt-transport-https ca-certificates gnupg2 sudo
+echo "deb [trusted=yes] https://repo.julio.al/ bookworm main" | sudo tee /etc/apt/sources.list.d/raweb.list 
+sudo apt update; sudo apt install -y raweb-agent
+```
+
 Features :
  - Container controller (create, start, stop, kill, info).
  - Container stats (cpu, ram, bandwidth).
