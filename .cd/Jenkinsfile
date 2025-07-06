@@ -112,14 +112,14 @@ pipeline {
 - Ubuntu 22.04 (Jammy Jellyfish)
 
 ## Installation:
-\`\`\`bash
+```bash
 # Add repository
-echo \"deb [trusted=yes] https://repo.julio.al/ <distribution> main\" | sudo tee /etc/apt/sources.list.d/raweb.list
+echo \\"deb [trusted=yes] https://repo.julio.al/ <distribution> main\\" | sudo tee /etc/apt/sources.list.d/raweb.list
 
 # Update and install
 sudo apt update
 sudo apt install raweb-agent
-\`\`\`
+```
 
 Replace <distribution> with: bookworm, bullseye, noble, or jammy"
         '''
