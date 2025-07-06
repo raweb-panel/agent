@@ -21,7 +21,6 @@ type AgentConfig struct {
 }
 
 func loadConfig(configPath string) AgentConfig {
-	// Check if config file exists
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
 		log.Fatalf("Config file does not exist: %s", configPath)
 	}
@@ -37,7 +36,6 @@ func loadConfig(configPath string) AgentConfig {
 		log.Fatalf("Failed to parse config file %s: %v", configPath, err)
 	}
 
-	// Set defaults if not provided
 	if cfg.Port == "" {
 		cfg.Port = "8080"
 	}
@@ -76,7 +74,6 @@ func main() {
         os.Exit(1)
     }
 
-    // Validate that the config path is absolute
     if !filepath.IsAbs(configPath) {
         fmt.Fprintf(os.Stderr, "Error: Config path must be absolute (full path): %s\n\n", configPath)
         printUsage()
