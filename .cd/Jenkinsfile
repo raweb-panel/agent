@@ -48,23 +48,165 @@ pipeline {
       }
     }
 
-    stage('Create DEB Package') {
+    stage('Create Multi-OS DEB Packages') {
+      parallel {
+        stage('Debian 12 (Bookworm)') {
+          steps {
+            script {
+              createDebPackage('debian12', 'bookworm', '12')
+            }
+          }
+        }
+        stage('Debian 11 (Bullseye)') {
+          steps {
+            script {
+              createDebPackage('debian11', 'bullseye', '11')
+            }
+          }
+        }
+        stage('Ubuntu 24.04 (Noble)') {
+          steps {
+            script {
+              createDebPackage('ubuntu2404', 'noble', '24.04')
+            }
+          }
+        }
+        stage('Ubuntu 22.04 (Jammy)') {
+          steps {
+            script {
+              createDebPackage('ubuntu2204', 'jammy', '22.04')
+            }
+          }
+        }
+      }
+    }
+
+    stage('Tag & Push') {
       steps {
         sh '''
-        # Create package directory structure
-        mkdir -p deb-package/raweb-agent/DEBIAN
-        mkdir -p deb-package/raweb-agent/raweb/apps/agent
-        mkdir -p deb-package/raweb-agent/etc/systemd/system
+        git config user.name "jenkins"
+        git config user.email "cd@julio.al"
+        git remote set-url origin https://$GITHUB_TOKEN@github.com/raweb-panel/agent.git
+        git tag $NEXT_TAG
+        git push origin $NEXT_TAG
+        '''
+      }
+    }
 
-        # Copy binary and config
-        cp agent deb-package/raweb-agent/raweb/apps/agent/
-        cp config.json deb-package/raweb-agent/raweb/apps/agent/
+    stage('Release to GitHub') {
+      steps {
+        sh '''
+        gh release create $NEXT_TAG agent.tar.gz \
+            raweb-agent_${VERSION}_debian12_amd64.deb \
+            raweb-agent_${VERSION}_debian11_amd64.deb \
+            raweb-agent_${VERSION}_ubuntu2404_amd64.deb \
+            raweb-agent_${VERSION}_ubuntu2204_amd64.deb \
+            --repo raweb-panel/agent \
+            --title "$NEXT_TAG" \
+            --notes "Automated release $NEXT_TAG
 
-        # Make binary executable
-        chmod +x deb-package/raweb-agent/raweb/apps/agent/agent
+## Supported Distributions:
+- Debian 12 (Bookworm)
+- Debian 11 (Bullseye)
+- Ubuntu 24.04 (Noble Numbat)
+- Ubuntu 22.04 (Jammy Jellyfish)
 
-        # Create systemd service file
-        cat > deb-package/raweb-agent/etc/systemd/system/raweb-agent.service << 'EOF'
+## Installation:
+\`\`\`bash
+# Add repository
+echo \"deb [trusted=yes] https://repo.julio.al/ <distribution> main\" | sudo tee /etc/apt/sources.list.d/raweb.list
+
+# Update and install
+sudo apt update
+sudo apt install raweb-agent
+\`\`\`
+
+Replace <distribution> with: bookworm, bullseye, noble, or jammy"
+        '''
+      }
+    }
+
+    stage('Upload DEB Packages to Repository') {
+      parallel {
+        stage('Upload Debian 12') {
+          steps {
+            sh '''
+            curl -X POST \
+              -H "Authorization: Bearer $GITHUB_TOKEN" \
+              -F "file=@raweb-agent_${VERSION}_debian12_amd64.deb" \
+              -F "distribution=debian12" \
+              https://repo.julio.al/upload/deb
+            '''
+          }
+        }
+        stage('Upload Debian 11') {
+          steps {
+            sh '''
+            curl -X POST \
+              -H "Authorization: Bearer $GITHUB_TOKEN" \
+              -F "file=@raweb-agent_${VERSION}_debian11_amd64.deb" \
+              -F "distribution=debian11" \
+              https://repo.julio.al/upload/deb
+            '''
+          }
+        }
+        stage('Upload Ubuntu 24.04') {
+          steps {
+            sh '''
+            curl -X POST \
+              -H "Authorization: Bearer $GITHUB_TOKEN" \
+              -F "file=@raweb-agent_${VERSION}_ubuntu2404_amd64.deb" \
+              -F "distribution=ubuntu2404" \
+              https://repo.julio.al/upload/deb
+            '''
+          }
+        }
+        stage('Upload Ubuntu 22.04') {
+          steps {
+            sh '''
+            curl -X POST \
+              -H "Authorization: Bearer $GITHUB_TOKEN" \
+              -F "file=@raweb-agent_${VERSION}_ubuntu2204_amd64.deb" \
+              -F "distribution=ubuntu2204" \
+              https://repo.julio.al/upload/deb
+            '''
+          }
+        }
+      }
+    }
+  }
+
+  post {
+    always {
+      // Clean up
+      sh 'rm -rf deb-package-*'
+    }
+    success {
+      echo "Build completed successfully!"
+      echo "DEB packages uploaded to https://repo.julio.al/upload/deb"
+    }
+    failure {
+      echo "Build failed!"
+    }
+  }
+}
+
+def createDebPackage(distId, distName, distVersion) {
+  sh """
+  # Create package directory structure
+  mkdir -p deb-package-${distId}/raweb-agent/DEBIAN
+  mkdir -p deb-package-${distId}/raweb-agent/raweb/apps/agent
+  mkdir -p deb-package-${distId}/raweb-agent/etc/systemd/system
+
+  # Copy binary and config
+  cp agent deb-package-${distId}/raweb-agent/raweb/apps/agent/
+  cp config.json deb-package-${distId}/raweb-agent/raweb/apps/agent/
+
+  # Make binary executable
+  chmod +x deb-package-${distId}/raweb-agent/raweb/apps/agent/agent
+
+  # Create systemd service file
+  cat > deb-package-${distId}/raweb-agent/etc/systemd/system/raweb-agent.service << 'EOF'
 [Unit]
 Description=Raweb Panel Agent
 After=network.target
@@ -84,20 +226,21 @@ StandardError=journal
 WantedBy=multi-user.target
 EOF
 
-        # Create control file
-        cat > deb-package/raweb-agent/DEBIAN/control << EOF
+  # Create control file with distribution-specific info
+  cat > deb-package-${distId}/raweb-agent/DEBIAN/control << EOF
 Package: raweb-agent
 Version: ${VERSION}
 Section: utils
 Priority: optional
 Architecture: amd64
 Maintainer: Raweb Panel <cd@julio.al>
-Description: Raweb Panel Agent
+Description: Raweb Panel Agent (${distName} ${distVersion})
  Agent for Raweb Panel management system
+ Built for ${distName} ${distVersion}
 EOF
 
-        # Create postinst script
-        cat > deb-package/raweb-agent/DEBIAN/postinst << 'EOF'
+  # Create postinst script
+  cat > deb-package-${distId}/raweb-agent/DEBIAN/postinst << 'EOF'
 #!/bin/bash
 set -e
 
@@ -113,8 +256,8 @@ fi
 echo "Raweb Agent installed and started successfully"
 EOF
 
-        # Create prerm script
-        cat > deb-package/raweb-agent/DEBIAN/prerm << 'EOF'
+  # Create prerm script
+  cat > deb-package-${distId}/raweb-agent/DEBIAN/prerm << 'EOF'
 #!/bin/bash
 set -e
 
@@ -128,8 +271,8 @@ if systemctl is-enabled --quiet raweb-agent.service; then
 fi
 EOF
 
-        # Create postrm script
-        cat > deb-package/raweb-agent/DEBIAN/postrm << 'EOF'
+  # Create postrm script
+  cat > deb-package-${distId}/raweb-agent/DEBIAN/postrm << 'EOF'
 #!/bin/bash
 set -e
 
@@ -137,78 +280,24 @@ set -e
 systemctl daemon-reload
 
 # Remove application directory if empty
-if [ -d "/raweb/apps/agent" ] && [ -z "$(ls -A /raweb/apps/agent)" ]; then
+if [ -d "/raweb/apps/agent" ] && [ -z "\$(ls -A /raweb/apps/agent)" ]; then
     rmdir /raweb/apps/agent
 fi
 
-if [ -d "/raweb/apps" ] && [ -z "$(ls -A /raweb/apps)" ]; then
+if [ -d "/raweb/apps" ] && [ -z "\$(ls -A /raweb/apps)" ]; then
     rmdir /raweb/apps
 fi
 
 echo "Raweb Agent removed successfully"
 EOF
 
-        # Make scripts executable
-        chmod +x deb-package/raweb-agent/DEBIAN/postinst
-        chmod +x deb-package/raweb-agent/DEBIAN/prerm
-        chmod +x deb-package/raweb-agent/DEBIAN/postrm
-        dpkg-deb --build deb-package/raweb-agent
-        mv deb-package/raweb-agent.deb raweb-agent_${VERSION}_amd64.deb
-        '''
-      }
-    }
+  # Make scripts executable
+  chmod +x deb-package-${distId}/raweb-agent/DEBIAN/postinst
+  chmod +x deb-package-${distId}/raweb-agent/DEBIAN/prerm
+  chmod +x deb-package-${distId}/raweb-agent/DEBIAN/postrm
 
-    stage('Tag & Push') {
-      steps {
-        sh '''
-        git config user.name "jenkins"
-        git config user.email "cd@julio.al"
-        git remote set-url origin https://$GITHUB_TOKEN@github.com/raweb-panel/agent.git
-        git tag $NEXT_TAG
-        git push origin $NEXT_TAG
-        '''
-      }
-    }
-
-    stage('Release to GitHub') {
-      steps {
-        sh '''
-        gh release create $NEXT_TAG agent.tar.gz raweb-agent_${VERSION}_amd64.deb \
-            --repo raweb-panel/agent \
-            --title "$NEXT_TAG" \
-            --notes "Automated release $NEXT_TAG"
-        '''
-      }
-    }
-
-    stage('Upload DEB to Repository') {
-      steps {
-        sh '''
-        # Upload .deb package to repository
-        curl -X POST \
-          -H "Authorization: Bearer $GITHUB_TOKEN" \
-          -F "file=@raweb-agent_${VERSION}_amd64.deb" \
-          -F "distribution=debian12" \
-          -F "component=main" \
-          -F "architecture=amd64" \
-          https://repo.julio.al/upload/debian12
-        '''
-      }
-    }
-  }
-
-  post {
-    always {
-      // Clean up
-      sh 'rm -rf deb-package'
-    }
-    success {
-      echo "Build completed successfully!"
-      echo "DEB package: raweb-agent_${env.VERSION}_amd64.deb"
-      echo "Uploaded to: https://repo.julio.al/upload/debian12"
-    }
-    failure {
-      echo "Build failed!"
-    }
-  }
+  # Build the package
+  dpkg-deb --build deb-package-${distId}/raweb-agent
+  mv deb-package-${distId}/raweb-agent.deb raweb-agent_${VERSION}_${distId}_amd64.deb
+  """
 }
