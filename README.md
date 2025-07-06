@@ -9,8 +9,8 @@
 
 ## Installation 
 
-- Debian 12/11
-- Ubuntu 24.04/22.04
+- Debian 12/11.
+- Ubuntu 24.04/22.04.
 ```bash
 apt update; apt install -y wget apt-transport-https ca-certificates gnupg2 sudo
 echo "deb [trusted=yes] https://repo.julio.al/ $(cat /etc/os-release | grep VERSION_CODENAME= | cut -d= -f2) main" | sudo tee /etc/apt/sources.list.d/raweb.list
