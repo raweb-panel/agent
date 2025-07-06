@@ -325,8 +325,13 @@ EOF
 
 def createRpmPackage(distId, distName, distVersion) {
   sh """
-  # Create RPM build directory structure
-  mkdir -p rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+  # Create RPM build directory structure explicitly
+  mkdir -p rpmbuild/BUILD
+  mkdir -p rpmbuild/BUILDROOT
+  mkdir -p rpmbuild/RPMS
+  mkdir -p rpmbuild/SOURCES
+  mkdir -p rpmbuild/SPECS
+  mkdir -p rpmbuild/SRPMS
 
   # Create spec file
   cat > rpmbuild/SPECS/raweb-agent.spec << 'EOF'
