@@ -21,4 +21,4 @@ Features :
 - "Developer Statistics", Must remain enabled for the simply purpose of above numbers tracking.
 - Redistribution, resale, or large-scale deployment requires a commercial license.
 
-Contact me@julio.al for enterprise licensing or additional rights/questions.
+Contact me@julio.al licensing or additional rights/questions.
