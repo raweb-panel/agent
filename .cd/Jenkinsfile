@@ -103,14 +103,7 @@ pipeline {
             raweb-agent_${VERSION}_ubuntu2204_amd64.deb \
             --repo raweb-panel/agent \
             --title "$NEXT_TAG" \
-            --notes "Automated release $NEXT_TAG
-
-## Supported Distributions:
-- Debian 12 (Bookworm)
-- Debian 11 (Bullseye)
-- Ubuntu 24.04 (Noble Numbat)
-- Ubuntu 22.04 (Jammy Jellyfish)
-```
+            --notes "Automated release $NEXT_TAG"
         '''
       }
     }
