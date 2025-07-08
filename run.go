@@ -36,13 +36,6 @@ func loadConfig(configPath string) AgentConfig {
 		log.Fatalf("Failed to parse config file %s: %v", configPath, err)
 	}
 
-	if cfg.Port == "" {
-		cfg.Port = "8080"
-	}
-	if cfg.ProjectPath == "" {
-		cfg.ProjectPath = "/raweb/web/panel/"
-	}
-
 	return cfg
 }
 

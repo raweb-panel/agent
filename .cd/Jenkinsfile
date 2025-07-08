@@ -1,7 +1,7 @@
 pipeline {
   agent {
     dockerContainer {
-      image 'theraw/jenkins-go-debian12:1.23.10'
+      image 'theraw/jenkins-go-debian12:1.24.5'
     }
   }
 

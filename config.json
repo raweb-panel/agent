@@ -1,5 +1,10 @@
 {
   "port": "8080",
   "project_path": "/raweb/web/panel/",
-  "docker": "unix:///var/run/docker.sock"
+  "docker": "unix:///var/run/docker.sock",
+  "jwt": {
+    "secret": "this-is-not-currently-in-use",
+    "issuer": "raweb-panel",
+    "audience": "raweb-agent"
+  }
 }

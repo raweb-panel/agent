@@ -11,7 +11,7 @@ Permission is hereby granted, free of charge, to any individual or organization 
 
 1. **Website Deployment Limit**
 
-   - Company or individual, can run/sell up to 100 nodes (workers) with the agent or panel or both. As part of free license.
+   - Company or individual, can run/sell up to unlimited nodes (workers) with the agent or panel or both. As part of free license.
    - Company or individual, can host/sell up to 100 websites per node or per client. As part of free license.
    - Company or individual, In free version, must keep "developer statistics" enabled, for purpose of tracking above stats.
 
@@ -38,7 +38,7 @@ Permission is hereby granted, free of charge, to any individual or organization 
 
 6. **Commercial Licensing**
 
-   - For deployment on more than 100 nodes/websites, SaaS integration, multi-tenant platforms, or redistribution rights, a separate commercial license must be obtained from the copyright holder.
+   - For deployment on more than 100 websites, SaaS integration, multi-tenant platforms, or redistribution rights, a separate commercial license must be obtained from the copyright holder.
 
 7. **Limited Warranty & Disclaimer**
 
