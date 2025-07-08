@@ -38,7 +38,7 @@ Permission is hereby granted, free of charge, to any individual or organization 
 
 6. **Commercial Licensing**
 
-   - For deployment on more than 100 websites, SaaS integration, multi-tenant platforms, or redistribution rights, a separate commercial license must be obtained from the copyright holder.
+   - For deployment on more than 100 nodes/websites, SaaS integration, multi-tenant platforms, or redistribution rights, a separate commercial license must be obtained from the copyright holder.
 
 7. **Limited Warranty & Disclaimer**
 

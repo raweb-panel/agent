@@ -1,4 +1,4 @@
-# raweb panel agent. ![](https://jenkins.julio.al/job/raweb-agent/badge/icon)
+# raweb panel agent. ![](https://jenkins.julio.al/job/raweb-agent/badge/icon) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=raweb-panel_agent&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=raweb-panel_agent)
 
 ---
 
