@@ -22,7 +22,6 @@ func InitAuthWithPath(projectPath string) {
 		log.Fatal("APP_KEY not set in .env")
 	}
 }
-
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token := r.Header.Get("Authorization")
