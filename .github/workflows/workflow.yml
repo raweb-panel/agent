@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: [self-hosted, epyc]
+    runs-on: [self-hosted, ryzen9]
     strategy:
       fail-fast: false
       matrix:
