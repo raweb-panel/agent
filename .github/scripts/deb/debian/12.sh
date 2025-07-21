@@ -29,7 +29,7 @@ tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz
 rm -f go${GO_VERSION}.linux-amd64.tar.gz
 export GOROOT=/usr/local/go
 export PATH=$PATH:$GOROOT/bin
-cd /raweb/web/panel/agent
+cd $GITHUB_WORKSPACE
 go clean -cache -modcache -testcache -i
 go mod tidy
 go build -ldflags="-s -w" -o agent run.go
