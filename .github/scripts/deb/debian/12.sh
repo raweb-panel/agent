@@ -75,9 +75,7 @@ Section: utils
 Priority: optional
 Architecture: $DEB_ARCH
 Maintainer: Raweb Panel <cd@julio.al>
-Description: Raweb Panel Agent for Debian 12 (Bookworm)
- Agent for Raweb Panel management system.
- Built for Debian 12 (Bookworm).
+Description: Raweb Panel Agent for Debian $BUILD_CODE
 EOF
 
 cat > "$DEB_ROOT/DEBIAN/postinst" <<'EOF'
