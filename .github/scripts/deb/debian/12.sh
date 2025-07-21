@@ -1,10 +1,10 @@
 #!/bin/bash
 set -e
 
-#if [ -z "$UPLOAD_USER" ] || [ -z "$UPLOAD_PASS" ]; then
-#    echo "Missing UPLOAD_USER or UPLOAD_PASS"
-#    exit 1
-#fi
+if [ -z "$UPLOAD_USER" ] || [ -z "$UPLOAD_PASS" ]; then
+    echo "Missing UPLOAD_USER or UPLOAD_PASS"
+    exit 1
+fi
 
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -y >/dev/null 2>&1 
@@ -19,7 +19,6 @@ DEB_DIST="$BUILD_CODE"
 DEB_PACKAGE_FILE_NAME="${DEB_PACKAGE_NAME}_${AGENT_VERSION}_${DEB_DIST}_${DEB_ARCH}.deb"
 DEB_REPO_URL="https://repo.julio.al/$UPLOAD_USER/$BUILD_REPO/${DEB_DIST}/"
 
-echo "Checking if $DEB_PACKAGE_FILE_NAME exists at $DEB_REPO_URL..."
 if curl -s "$DEB_REPO_URL" | grep -q "$DEB_PACKAGE_FILE_NAME"; then
     echo "✅ Package $DEB_PACKAGE_FILE_NAME already exists. Skipping build."
     exit 0
