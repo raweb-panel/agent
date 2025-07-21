@@ -1,3 +1,5 @@
+#!/bin/bash
+set -e
 
 if [ -z "$UPLOAD_USER" ] || [ -z "$UPLOAD_PASS" ]; then
     echo "Missing UPLOAD_USER or UPLOAD_PASS"
@@ -5,7 +7,7 @@ if [ -z "$UPLOAD_USER" ] || [ -z "$UPLOAD_PASS" ]; then
 fi
 
 dnf install -y epel-release >/dev/null 2>&1
-dnf install -y gcc git sudo wget curl zip unzip jq rsync rpm-build >/dev/null 2>&1
+dnf install -y gcc git sudo wget curl zip unzip jq rsync rpm-build rsync >/dev/null 2>&1
 
 cd "$GITHUB_WORKSPACE"
 AGENT_VERSION=$(cat VERSION)
