@@ -7,7 +7,8 @@ set -e
 #fi
 
 export DEBIAN_FRONTEND=noninteractive
-apt-get update -y && apt-get upgrade -y >/dev/null 2>&1
+apt-get update -y >/dev/null 2>&1 
+apt-get upgrade -y >/dev/null 2>&1
 apt-get install -y build-essential git sudo wget curl zip unzip jq rsync >/dev/null 2>&1
 
 cd "$GITHUB_WORKSPACE"
@@ -24,8 +25,8 @@ if curl -s "$DEB_REPO_URL" | grep -q "$DEB_PACKAGE_FILE_NAME"; then
     exit 0
 fi
 cd /tmp
-wget https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz
-tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz
+wget https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz >/dev/null 2>&1
+tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz >/dev/null 2>&1
 rm -f go${GO_VERSION}.linux-amd64.tar.gz
 export GOROOT=/usr/local/go
 export PATH=$PATH:$GOROOT/bin
