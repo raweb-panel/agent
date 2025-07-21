@@ -7,46 +7,15 @@
 
 ---
 
-## Installation 
+## Requirements 
 
 - Debian 12/11.
 - Ubuntu 24.04/22.04.
 - AlmaLinux 9/8.
+- Docker, should be present on the same server. (free version limit).
+- Raweb Panel, should be present on the same server. (free version limit).
 
-Debian Based.
-```bash
-apt update; apt install -y wget apt-transport-https ca-certificates gnupg2 sudo
-echo "deb [trusted=yes] https://repo.julio.al/ $(cat /etc/os-release | grep VERSION_CODENAME= | cut -d= -f2) main" | sudo tee /etc/apt/sources.list.d/raweb.list
-sudo apt update; sudo apt install -y raweb-agent
-```
-
-AlmaLinux Based.
-```bash
-sudo dnf install -y wget ca-certificates gnupg2
-# For AlmaLinux 9:
-sudo tee /etc/yum.repos.d/raweb.repo << 'EOF'
-[raweb-alma9]
-name=Raweb Panel Repository for AlmaLinux 9
-baseurl=https://repo.julio.al/rpm/alma9/x86_64
-enabled=1
-gpgcheck=0
-EOF
-
-# For AlmaLinux 8, use the following instead:
-sudo tee /etc/yum.repos.d/raweb.repo << 'EOF'
-[raweb-alma8]
-name=Raweb Panel Repository for AlmaLinux 8
-baseurl=https://repo.julio.al/rpm/alma8/x86_64
-enabled=1
-gpgcheck=0
-EOF
-
-# Update repository cache
-sudo dnf makecache
-
-# Install package
-sudo dnf install raweb-agent
-```
+This is part of the panel, it cannot run standalone, so you can follow installation steps on the [panel](https://github.com/raweb-panel/raweb) repository.
 
 ---
 
@@ -62,7 +31,7 @@ sudo dnf install raweb-agent
 
 ## License
 
-- By downloading, installing, or using the software, the Licensee agrees to be bound by the terms of this License. [Custom Deployment License (CDL)](./LICENSE).  
+- By downloading, installing, or using the software, the Licensee agrees to be bound by the terms of this License. [Custom Deployment License (CDL)](./LICENSE.md).  
 - Free for commercial use on up to unlimited nodes and 100 websites per node.
 - "Developer Statistics", Must remain enabled for the simply purpose of above numbers tracking.
 - Redistribution, resale, or large-scale deployment requires a commercial license.
