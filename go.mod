@@ -3,7 +3,7 @@ module agent
 go 1.24.5
 
 require (
-	github.com/docker/docker v28.3.1+incompatible
+	github.com/docker/docker v28.3.3+incompatible
 	github.com/joho/godotenv v1.5.1
 )
 
