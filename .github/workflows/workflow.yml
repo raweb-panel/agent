@@ -22,34 +22,6 @@ jobs:
             folder: packages
             script: .github/scripts/deb/debian/12.sh
 
-          - name: debian11
-            image: debian:11
-            code: bullseye
-            repo: debian
-            folder: packages
-            script: .github/scripts/deb/debian/11.sh
-
-          - name: alma8
-            image: almalinux:8
-            code: el8
-            repo: alma
-            folder: packages
-            script: .github/scripts/rpm/alma/8.sh
-
-          - name: alma9
-            image: almalinux:9
-            code: el9
-            repo: alma
-            folder: packages
-            script: .github/scripts/rpm/alma/9.sh
-
-          - name: ubuntu2204
-            image: ubuntu:22.04
-            code: jammy
-            repo: ubuntu
-            folder: packages
-            script: .github/scripts/deb/ubuntu/22.04.sh
-
           - name: ubuntu2404
             image: ubuntu:24.04
             code: noble
@@ -66,6 +38,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Read version from VERSION file
+        id: version
+        run: echo "AGENT_PACK_VERSION=$(cat VERSION)" >> $GITHUB_ENV
+
       - name: Run Build Script
         run: |
           chmod +x ${{ matrix.script }}
@@ -77,5 +53,8 @@ jobs:
           BUILD_REPO: ${{ matrix.repo }}
           BUILD_FOLDER: ${{ matrix.folder }}
           GO_VERSION: '1.24.5'
+          BUILD_CORES: '70'
+          DOMAIN: 'de.repo.raweb.al'
           UPLOAD_USER: ${{ secrets.UPLOAD_USER }}
           UPLOAD_PASS: ${{ secrets.UPLOAD_PASS }}
+          AGENT_PACK_VERSION: ${{ env.AGENT_PACK_VERSION }}

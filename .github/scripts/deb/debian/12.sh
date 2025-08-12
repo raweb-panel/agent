@@ -17,7 +17,7 @@ DEB_PACKAGE_NAME="raweb-agent"
 DEB_ARCH="amd64"
 DEB_DIST="$BUILD_CODE"
 DEB_PACKAGE_FILE_NAME="${DEB_PACKAGE_NAME}_${AGENT_VERSION}_${DEB_DIST}_${DEB_ARCH}.deb"
-DEB_REPO_URL="https://repo.julio.al/$UPLOAD_USER/$BUILD_REPO/${DEB_DIST}/"
+DEB_REPO_URL="https://$DOMAIN/$UPLOAD_USER/$BUILD_REPO/${DEB_DIST}/"
 
 if curl -s "$DEB_REPO_URL" | grep -q "$DEB_PACKAGE_FILE_NAME"; then
     echo "✅ Package $DEB_PACKAGE_FILE_NAME already exists. Skipping build."
@@ -120,4 +120,4 @@ dpkg-deb --build "$DEB_ROOT" "$DEB_PACKAGE_FILE"
 ls -la "$DEB_PACKAGE_FILE"
 echo "$UPLOAD_PASS" > $GITHUB_WORKSPACE/.rsync
 chmod 600 $GITHUB_WORKSPACE/.rsync
-rsync -avz --password-file=$GITHUB_WORKSPACE/.rsync "$DEB_PACKAGE_FILE" rsync://$UPLOAD_USER@repo.julio.al/$BUILD_FOLDER/$BUILD_REPO/$BUILD_CODE/
+rsync -avz --password-file=$GITHUB_WORKSPACE/.rsync "$DEB_PACKAGE_FILE" rsync://$UPLOAD_USER@$DOMAIN/$BUILD_FOLDER/$BUILD_REPO/$BUILD_CODE/

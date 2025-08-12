@@ -1,7 +1,8 @@
 {
   "port": "8080",
-  "project_path": "/raweb/web/panel/",
+  "project_path": "/raweb/apps/raweb/nginx/panel/",
   "docker": "unix:///var/run/docker.sock",
+  "allowed_ips": ["0.0.0.0"],
   "jwt": {
     "secret": "this-is-not-currently-in-use",
     "issuer": "raweb-panel",
