@@ -49,7 +49,7 @@ func CreateHome(serverName, username string) error {
 	exec.Command("chown", "-R", username+":"+username, domainDir).Run()
 
 	// 5. Copy config
-	defaultConfig := "/raweb/web/panel/app/Helpers/defaults/config"
+	defaultConfig := "/raweb/apps/raweb/panel/app/Helpers/config"
 	targetConfigDir := filepath.Join("/home/configs", username, serverName, "config")
 	if err := os.MkdirAll(targetConfigDir, 0755); err != nil {
 		return errors.New("failed to create config directory: " + targetConfigDir)

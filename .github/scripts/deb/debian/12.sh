@@ -54,14 +54,18 @@ After=network.target
 Wants=network.target
 
 [Service]
-Type=simple
+Type=forking
 User=root
 WorkingDirectory=/raweb/apps/agent
-ExecStart=/raweb/apps/agent/agent --config=/raweb/apps/agent/config.json
-Restart=always
-RestartSec=10
+RuntimeDirectory=raweb-agent
+PIDFile=/run/raweb-agent/raweb-agent.pid
+ExecStart=/sbin/start-stop-daemon --start --background --make-pidfile --pidfile /run/raweb-agent/raweb-agent.pid --chdir /raweb/apps/agent --exec /raweb/apps/agent/agent -- --config=/raweb/apps/agent/config.json
+ExecStop=/sbin/start-stop-daemon --stop --pidfile /run/raweb-agent/raweb-agent.pid --retry=TERM/10/KILL/5
+Restart=on-failure
+RestartSec=5
 StandardOutput=journal
 StandardError=journal
+KillMode=mixed
 
 [Install]
 WantedBy=multi-user.target

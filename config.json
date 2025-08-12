@@ -1,6 +1,6 @@
 {
   "port": "8080",
-  "project_path": "/raweb/apps/raweb/nginx/panel/",
+  "project_path": "/raweb/apps/raweb/panel/",
   "docker": "unix:///var/run/docker.sock",
   "allowed_ips": ["0.0.0.0"],
   "jwt": {
